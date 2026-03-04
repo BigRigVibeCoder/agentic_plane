@@ -110,3 +110,15 @@ documents:
       Exhaustive testing taxonomy with 14 test tiers from static analysis to
       soak testing. Defines tools, thresholds, forensic artifacts, fail-fast
       execution order, and agent instructions for implementing testing.
+
+  - id: GOV-003
+    path: 10_GOVERNANCE/GOV-003_CodingStandard.md
+    title: "Coding Standard"
+    type: reference
+    status: APPROVED
+    tags: [coding, standards, governance, quality, safety]
+    agents: [all]
+    summary: >
+      Polyglot coding standard for Python, C/C++, and React/TypeScript.
+      NASA Power of 10 backbone with MISRA C:2025 and CERT C for system code.
+      Features the Disaster-Readability Principle for human emergency access.
