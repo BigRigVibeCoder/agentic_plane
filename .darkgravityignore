@@ -1,0 +1,46 @@
+# DarkGravity RAG exclusion patterns
+# Files matching these patterns will NOT be indexed for agent context.
+# Uses .gitignore-style glob syntax.
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+target/
+
+# Large binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.mp3
+*.mp4
+*.zip
+*.tar.gz
+*.db
+*.sqlite
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# DarkGravity internals
+.darkgravity/embeddings/
+.darkgravity/sessions/
+.darkgravity/backups/

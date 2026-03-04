@@ -1,0 +1,19 @@
+# DarkGravity — Per-Project Agent Configuration
+# See: docs/specs/workspace.md for full reference
+
+# researcher:
+#   model: gemini-3.1-pro
+#   swarm:
+#     enabled: false
+
+# architect:
+#   model: gemini-3-flash
+#   swarm:
+#     enabled: true
+#     preset: balanced
+
+# coder:
+#   model: gemini-3.1-pro
+
+# tester:
+#   model: gemini-3-flash

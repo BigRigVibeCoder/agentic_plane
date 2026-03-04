@@ -1,0 +1,7 @@
+# DarkGravity — Per-Project Settings Override
+# Settings here override ~/.darkgravity/config.yaml
+# See: docs/specs/workspace.md for full reference
+
+# supervised: true
+# daily_budget_usd: 5.00
+# log_level: INFO
