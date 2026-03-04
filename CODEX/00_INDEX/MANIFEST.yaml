@@ -93,7 +93,7 @@ documents:
     title: "Documentation Standard"
     type: reference
     status: APPROVED
-    tags: [documentation, standards, naming, frontmatter, templates]
+    tags: [documentation, standards, naming, frontmatter, templates, governance]
     agents: [all]
     summary: >
       Meta-standard defining naming conventions, YAML frontmatter requirements,

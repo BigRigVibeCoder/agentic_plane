@@ -25,6 +25,8 @@ lifecycle:
 
 # ── Documentation ─────────────────────────────────────────────────────────────
 documentation:
+  - tag: documentation
+    description: "Documentation processes, doc management, doc generation"
   - tag: standards
     description: "Coding standards, naming conventions, formatting rules"
   - tag: naming
@@ -37,6 +39,8 @@ documentation:
     description: "Navigation, entry points, master indexes"
   - tag: entry-point
     description: "Starting point for humans or agents"
+  - tag: navigation
+    description: "Navigation aids, wayfinding, document discovery"
 
 # ── Architecture ──────────────────────────────────────────────────────────────
 architecture:
@@ -57,6 +61,12 @@ architecture:
 development:
   - tag: coding
     description: "Coding practices, code style, implementation patterns"
+  - tag: governance
+    description: "Governance protocols, compliance, organizational standards"
+  - tag: quality
+    description: "Code quality, review standards, quality metrics"
+  - tag: safety
+    description: "Safety-critical practices, fail-safe design, hazard mitigation"
   - tag: dependencies
     description: "Package management, version pinning"
   - tag: security
