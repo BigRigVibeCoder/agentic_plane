@@ -122,3 +122,15 @@ documents:
       Polyglot coding standard for Python, C/C++, and React/TypeScript.
       NASA Power of 10 backbone with MISRA C:2025 and CERT C for system code.
       Features the Disaster-Readability Principle for human emergency access.
+
+  - id: GOV-004
+    path: 10_GOVERNANCE/GOV-004_ErrorHandlingProtocol.md
+    title: "Error Handling Protocol"
+    type: reference
+    status: APPROVED
+    tags: [coding, standards, governance, quality, safety]
+    agents: [all]
+    summary: >
+      Zero-dark-failure error handling with 13-category taxonomy, structured
+      error context, global exception handlers, crash artifacts, circuit
+      breakers, correlation IDs, and recovery strategies.
