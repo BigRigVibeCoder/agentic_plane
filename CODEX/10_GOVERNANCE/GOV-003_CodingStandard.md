@@ -596,6 +596,25 @@ HeaderFilterRegex: '.*'
 }
 ```
 
+### 12.4 NASA Power of 10 — Enforcement Matrix
+
+> Which tool enforces which rule? **No rule without a scanner.**
+
+| # | Power of 10 Rule | Python Enforcement | C/C++ Enforcement | TypeScript Enforcement |
+|:--|:----------------|:-------------------|:-------------------|:-----------------------|
+| 1 | Simple control flow (no goto) | Ruff `PLR5501` | Clang-Tidy `readability-avoid-goto` | ESLint `no-labels` |
+| 2 | Fixed loop bounds (no unbounded loops) | Manual review + `@trace_execution` | MISRA C:2025 Rule 15.4 | Manual review |
+| 3 | No dynamic alloc after init | Manual review | Clang-Tidy `cert-mem*` + MISRA | N/A (GC language) |
+| 4 | Short functions (≤60 lines) | Ruff `PLR0915` | Clang-Tidy `readability-function-size` | ESLint `max-lines-per-function` |
+| 5 | Assertion density (≥2/function) | Custom scanner + pytest | `assert` macro + Clang-Tidy | Custom ESLint rule |
+| 6 | Minimal data scope (no globals) | Ruff `PLW0602`, `PLW0603` | Clang-Tidy `misc-use-anonymous-namespace` | ESLint `no-var` + strict |
+| 7 | Check all return values | MyPy `--strict` + Ruff `RET` | Clang-Tidy `bugprone-unused-return-value` | `@typescript-eslint/no-unused-vars` |
+| 8 | Limited preprocessor use | N/A | Clang-Tidy `modernize-macro-*` | N/A |
+| 9 | Restrict pointer use | N/A | MISRA C:2025 Rules 18.* | N/A |
+| 10 | Pedantic compilation (all warnings = errors) | Ruff `--select ALL` + MyPy strict | `-Wall -Werror -Wextra -pedantic` | `tsc --strict` |
+
+**Agent Rule**: When setting up a project, verify that every applicable Power of 10 rule has an automated enforcer. If a tool doesn't exist for a rule, document the gap and require manual review.
+
 ---
 
 ## 13. Compliance Checklist
