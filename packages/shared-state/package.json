@@ -1,0 +1,33 @@
+{
+  "name": "@plane/shared-state",
+  "version": "1.2.2",
+  "license": "AGPL-3.0",
+  "description": "Shared state shared across multiple apps internally",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "check:lint": "eslint . --max-warnings=191",
+    "check:types": "tsc --noEmit",
+    "check:format": "prettier --check .",
+    "fix:lint": "eslint . --fix --max-warnings=191",
+    "fix:format": "prettier --write .",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules && rm -rf dist"
+  },
+  "dependencies": {
+    "@plane/constants": "workspace:*",
+    "@plane/types": "workspace:*",
+    "@plane/utils": "workspace:*",
+    "lodash-es": "catalog:",
+    "mobx": "catalog:",
+    "mobx-utils": "catalog:",
+    "uuid": "catalog:",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@plane/typescript-config": "workspace:*",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
