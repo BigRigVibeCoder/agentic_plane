@@ -9,10 +9,10 @@ tags: [coding, standards, governance, quality, safety]
 related: [GOV-001, GOV-002]
 created: 2026-03-04
 updated: 2026-03-04
-version: 1.0.0
+version: 2.0.0
 ---
 
-> **BLUF:** Polyglot coding standard for agent-written code. Covers Python, C/C++, and React/TypeScript. While 99% of this code will never be read by humans, it MUST be written so that in a disaster, a human engineer can understand any function in 30 seconds. NASA Power of 10 rules are the backbone for all languages.
+> **BLUF:** NASA/JPL-grade polyglot coding standard for agent-written code. Covers Python, C/C++, and React/TypeScript. Enforces NASA Power of 10, MISRA C:2025, DO-178C code review mandates, dead code prohibition, boundary condition requirements, and the Disaster-Readability Principle. While 99% of this code will never be read by humans, it MUST be written so that in a disaster, a human engineer can understand any function in 30 seconds.
 
 # Coding Standard: The Engineering Discipline
 
@@ -186,7 +186,31 @@ if distance < SAFE_STOP_DISTANCE_M:
     stop()
 ```
 
-### 5.4 Forbidden Patterns (All Languages)
+### 5.4 Boundary Condition Handling (NASA-HDBK-2203 §5.3)
+
+Every function that accepts ranges, collections, or external input **MUST** explicitly handle boundary conditions:
+
+- **Empty inputs** — empty collections, zero-length strings, null/None
+- **Off-by-one** — first element, last element, length ± 1
+- **Overflow/underflow** — integer limits, float precision, buffer sizes
+- **Negative values** — when only positive is valid
+- **Maximum size** — largest input the function can handle
+
+```python
+def get_element(items: list[T], index: int) -> T:
+    # BOUNDARY: empty collection
+    if not items:
+        raise ValueError("Cannot get element from empty list")
+    # BOUNDARY: negative index
+    if index < 0:
+        raise IndexError(f"Negative index not allowed: {index}")
+    # BOUNDARY: overflow
+    if index >= len(items):
+        raise IndexError(f"Index {index} out of range [0, {len(items) - 1}]")
+    return items[index]
+```
+
+### 5.5 Forbidden Patterns (All Languages)
 
 | Pattern | Why | Alternative |
 |:--------|:----|:------------|
@@ -196,6 +220,9 @@ if distance < SAFE_STOP_DISTANCE_M:
 | Wildcard imports | Namespace pollution | Import specific names |
 | Mutable default arguments | Shared state | Use `None` sentinel |
 | Ignoring return values | Silent failures | Always check or comment `_ =` |
+| **Dead code** | Confuses readers, hides bugs | Delete it. Use VCS to retrieve. |
+| **Unreachable code** | Indicates logic errors | Remove or fix control flow |
+| **Commented-out code** | Not documentation, just noise | Delete it. Git remembers. |
 
 ---
 
@@ -455,7 +482,123 @@ export function StatusPanel({ status, onRefresh }: StatusPanelProps) {
 
 ---
 
-## 10. Compliance Checklist
+## 10. Code Review Mandate (DO-178C §6.3.4)
+
+> **All code must be peer-reviewed before merge.** No exceptions.
+
+### 10.1 Review Requirements
+
+| Code Type | Reviewer Requirement | Standard |
+|:----------|:--------------------|:---------|
+| Safety-critical | **Independent reviewer** (not the author) | DO-178C DAL-A |
+| Core business logic | Peer review by any team member | DO-178C DAL-C |
+| Utilities / non-critical | Self-review with checklist is acceptable | — |
+
+### 10.2 What Reviewers Check
+
+1. **Correctness** — Does the code do what the requirements specify?
+2. **Boundary conditions** — Are all edge cases handled? (§5.4)
+3. **Dead code** — Is there any unreachable or commented-out code? (§5.5)
+4. **Naming** — Do names follow §3 conventions?
+5. **Complexity** — Does any function exceed the metrics in §11?
+6. **Error handling** — Does it follow GOV-004?
+7. **Assertions** — Are there ≥2 per non-trivial function?
+8. **30-second rule** — Can the reviewer understand each function in 30 seconds?
+
+### 10.3 Agent Code Review
+
+When agents write code, the reviewing agent (or human) MUST verify against this checklist. Agents writing safety-critical code MUST flag it for independent review with the comment `# SAFETY-CRITICAL: requires independent review`.
+
+---
+
+## 11. Compliance Metrics Dashboard
+
+> Consolidated table of all quantitative thresholds. **One place to check, zero ambiguity.**
+
+| Metric | Target | Absolute Limit | Enforcement | Source |
+|:-------|:-------|:---------------|:------------|:-------|
+| Lines per function | ≤40 | **≤60** | Linter | JPL D-60411 |
+| Lines per file | ≤300 | **≤500** | Linter | JPL D-60411 |
+| Cyclomatic complexity | ≤7 | **≤10** | Linter | McCabe / NIST |
+| Nesting depth | ≤3 | **≤4** | Linter | JPL Power of 10 |
+| Parameters per function | ≤4 | **≤5** | Code review | Clean Code |
+| Assertion density | ≥2/function | **≥1/function** | Custom lint | JPL Rule 5 |
+| Type coverage (Python) | 100% | **≥95%** | MyPy | JPL Rule 10 |
+| Type coverage (TypeScript) | 100% | **≥95%** | tsc --strict | — |
+| Dead code | 0 lines | **0 lines** | Linter | MISRA C:2025 |
+| Compiler/linter warnings | 0 | **0** | CI gate | JPL Rule 10 |
+| Code review coverage | 100% | **100%** | Process | DO-178C §6.3.4 |
+
+---
+
+## 12. Static Analysis Rule Profiles (JPL D-60411)
+
+> Every project MUST specify which rule profile to enable. **No "we'll add linting later."**
+
+### 12.1 Python — Ruff Profile
+
+```toml
+# pyproject.toml — Mandatory Ruff configuration
+[tool.ruff]
+select = ["ALL"]
+ignore = [
+    "D203",   # Conflicts with D211
+    "D213",   # Conflicts with D212
+    "COM812", # Conflicts with formatter
+    "ISC001", # Conflicts with formatter
+]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.per-file-ignores]
+"tests/**" = ["S101"]  # Allow assert in tests
+
+[tool.ruff.pylint]
+max-args = 5
+max-statements = 50
+```
+
+### 12.2 C/C++ — Clang-Tidy Profile
+
+```yaml
+# .clang-tidy — Mandatory checks
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -modernize-use-trailing-return-type
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+```
+
+### 12.3 TypeScript — ESLint Profile
+
+```json
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    "no-console": "warn",
+    "max-lines-per-function": ["warn", 60],
+    "complexity": ["error", 10]
+  }
+}
+```
+
+---
+
+## 13. Compliance Checklist
 
 Before submitting code in **any language**:
 
@@ -468,8 +611,11 @@ Before submitting code in **any language**:
 - [ ] Guard clauses handle error paths first
 - [ ] ≥2 assertions per non-trivial function
 - [ ] File header explains purpose and consumers
-- [ ] No forbidden patterns used
+- [ ] No forbidden patterns (including dead code, unreachable code, commented-out code)
+- [ ] All boundary conditions explicitly handled (§5.4)
 - [ ] All linter/compiler warnings resolved (zero tolerance)
+- [ ] Static analysis profile enabled and passing (§12)
+- [ ] Code reviewed per §10 (independent review for safety-critical)
 - [ ] A human can understand any function in 30 seconds
 
 ---

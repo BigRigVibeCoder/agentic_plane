@@ -9,10 +9,10 @@ tags: [coding, standards, governance, quality, safety]
 related: [GOV-002, GOV-003]
 created: 2026-03-04
 updated: 2026-03-04
-version: 1.0.0
+version: 2.0.0
 ---
 
-> **BLUF:** Zero-dark-failure error handling protocol. No error happens silently. No application crashes without a trace. Every exception is caught, classified, logged with full stack trace and context, and either recovered from or escalated. This document defines the error taxonomy, propagation rules, crash artifact requirements, and recovery strategies for all languages.
+> **BLUF:** NASA/JPL-grade error handling protocol. Zero-dark-failure doctrine: no error happens silently, no application crashes without a trace. Every exception is caught, classified by severity level (DO-178C DAL mapping), logged with full stack trace and context, and either recovered from or escalated. Includes FMEA requirements, crash artifacts, circuit breakers, correlation IDs, and mandatory post-incident review.
 
 # Error Handling Protocol: "No Error in the Dark"
 
@@ -51,6 +51,37 @@ All errors are classified by **Category** and **Severity**. This drives automate
 | **FATAL** | Unrecoverable — data corruption, safety breach | EMERGENCY_STOP | CRITICAL |
 | **TRANSIENT** | Temporary glitch (noise, blip, race condition) | IMMEDIATE (max 3x) | LOW |
 | **UNKNOWN** | Uncaught generic exception | NO_RETRY + Log + Alert | HIGH |
+
+---
+
+## 3. Severity Levels (DO-178C Table A-1)
+
+Every error has a **Category** (what went wrong) and a **Severity Level** (how bad it is). The severity drives response requirements.
+
+| Level | Name | Definition | Response Requirements | DAL Equivalent |
+|:------|:-----|:-----------|:---------------------|:---------------|
+| **1** | **CATASTROPHIC** | Data loss, safety breach, physical harm possible | EMERGENCY_STOP. Crash artifact. Immediate human notification. Full post-incident review. | DAL-A |
+| **2** | **HAZARDOUS** | Major function lost, security compromised | Immediate safe-state. Crash artifact. Alert on-call. Post-incident review within 24h. | DAL-B |
+| **3** | **MAJOR** | Significant degradation, data integrity at risk | Log ERROR. Alert. Automated recovery attempt. Review within 1 sprint. | DAL-C |
+| **4** | **MINOR** | Reduced capability, user inconvenience | Log WARN. Retry if applicable. Track for patterns. | DAL-D |
+| **5** | **NO EFFECT** | Cosmetic, logged for completeness | Log INFO. No action required. | DAL-E |
+
+### 3.1 Mapping Categories to Severity
+
+| Category | Default Severity | Can Escalate To |
+|:---------|:----------------|:----------------|
+| FATAL | **1 — CATASTROPHIC** | — |
+| HARDWARE | **2 — HAZARDOUS** | 1 if safety-critical |
+| INFRASTRUCTURE | **2 — HAZARDOUS** | 1 if data loss |
+| CONFIGURATION | **3 — MAJOR** | 2 if at runtime |
+| SECURITY | **3 — MAJOR** | 1 if breach confirmed |
+| EXTERNAL_SERVICE | **3 — MAJOR** | 2 if critical dependency |
+| DATABASE | **3 — MAJOR** | 1 if data corruption |
+| NETWORK | **4 — MINOR** | 3 if persistent |
+| BUSINESS_LOGIC | **4 — MINOR** | 3 if data integrity |
+| VALIDATION | **5 — NO EFFECT** | 4 if frequent |
+| TRANSIENT | **5 — NO EFFECT** | 3 if pattern detected |
+| UNKNOWN | **3 — MAJOR** | 1 pending investigation |
 
 ---
 
@@ -438,35 +469,117 @@ someAsyncOperation();  // If this rejects, the error is lost
 
 ---
 
-## 11. Compliance Checklist
+## 11. Failure Mode & Effects Analysis (NASA-HDBK-2203 §4.4)
+
+Before deploying any system with error handling, conduct a **Failure Mode & Effects Analysis (FMEA)** to systematically identify what can fail, how it fails, and what happens when it does.
+
+### 11.1 FMEA Requirements
+
+For each component/service, document:
+
+| Column | Description |
+|:-------|:------------|
+| **Failure Mode** | What can go wrong (e.g., "database connection lost") |
+| **Cause** | Why it would fail (e.g., "network partition", "OOM") |
+| **Effect** | What happens to the system (e.g., "writes fail, reads serve stale cache") |
+| **Severity** | Level 1–5 per §3 |
+| **Detection** | How the failure is detected (e.g., "health check timeout", "error rate spike") |
+| **Mitigation** | Recovery strategy per §7 |
+| **Residual Risk** | What risk remains after mitigation |
+
+### 11.2 When FMEA Is Required
+
+- **Always** for safety-critical components (Severity 1–2)
+- **Before first deployment** of any new service
+- **After major architecture changes** that alter failure boundaries
+- **Annually** as part of system review for long-running services
+
+---
+
+## 12. Post-Incident Review (NPR 7150.2D §3.8)
+
+Every Severity 1–3 error that reaches production triggers a **mandatory post-incident review**.
+
+### 12.1 Timeline
+
+| Severity | Review Deadline | Report Due |
+|:---------|:---------------|:-----------|
+| **1 — CATASTROPHIC** | Within 24 hours | 48 hours |
+| **2 — HAZARDOUS** | Within 48 hours | 1 week |
+| **3 — MAJOR** | Within 1 sprint | End of sprint |
+
+### 12.2 Post-Incident Report Template
+
+```markdown
+# Post-Incident Report: [ERROR_ID]
+
+## Summary
+- **Date/Time**: [ISO 8601]
+- **Severity**: [1-5]
+- **Duration**: [time to detection → time to resolution]
+- **Impact**: [what was affected, how many users/requests]
+
+## Timeline
+- [HH:MM] Event detected via [detection method]
+- [HH:MM] On-call notified
+- [HH:MM] Root cause identified
+- [HH:MM] Fix deployed
+- [HH:MM] Confirmed resolved
+
+## Root Cause Analysis
+[5 Whys or Fishbone analysis]
+
+## Corrective Actions
+- [ ] [Action item with owner and due date]
+- [ ] [Regression test added per GOV-002 §21]
+- [ ] [FMEA updated if new failure mode discovered]
+
+## Lessons Learned
+[What we learned and what changes to prevent recurrence]
+```
+
+### 12.3 The Blameless Rule
+
+Post-incident reviews are **blameless**. The goal is to improve the system, not assign fault. Focus on: *What conditions allowed this to happen? How do we prevent it?*
+
+---
+
+## 13. Compliance Checklist
 
 Before deploying any service:
 
 - [ ] Global exception handler installed at every entry point (§4)
-- [ ] All custom exceptions extend `ApplicationError` with structured context (§3)
+- [ ] All custom exceptions extend `ApplicationError` with structured context (§4)
 - [ ] All errors include full stack traces in logs (Law #2)
+- [ ] Severity levels assigned per §3 taxonomy
 - [ ] Correlation IDs generated at ingress and propagated everywhere (§8)
 - [ ] All background/async tasks wrapped with error handlers (§10)
 - [ ] Crash artifacts written for FATAL and unhandled errors (§6)
 - [ ] No forbidden patterns present — `except: pass` scanner passes (§9)
 - [ ] Recovery strategies match the error taxonomy (§7)
-- [ ] Error logs include: timestamp, error_id, category, message, stack_trace, correlation_id
+- [ ] Circuit breakers configured for external dependencies (§7.2)
+- [ ] FMEA completed for all Severity 1-2 components (§11)
+- [ ] Post-incident review process documented and team trained (§12)
+- [ ] Error logs include: timestamp, error_id, severity, category, message, stack_trace, correlation_id
 - [ ] Crash artifact destination defined in project specification (§6.2)
 
 ---
 
-## 12. Agent Instructions
+## 14. Agent Instructions
 
 When an architect asks you to "set up error handling" or "add error handling," follow this protocol:
 
 1. **Install global exception handler** at every entry point (§4)
-2. **Create `ApplicationError` base class** with `ErrorContext` (§3)
+2. **Create `ApplicationError` base class** with `ErrorContext` (§4)
 3. **Define error categories** relevant to the project (§2)
-4. **Wrap all async/background tasks** with safe wrappers (§10)
-5. **Set up crash artifact storage** per project specification (§6)
-6. **Implement correlation ID propagation** (§8)
-7. **Configure static scanner** to reject forbidden patterns (§9)
-8. **Add to CI pipeline** — scanner must pass before merge
+4. **Assign severity levels** to each category (§3)
+5. **Wrap all async/background tasks** with safe wrappers (§10)
+6. **Set up crash artifact storage** per project specification (§6)
+7. **Implement correlation ID propagation** (§8)
+8. **Configure static scanner** to reject forbidden patterns (§9)
+9. **Create FMEA** for all Severity 1-2 components (§11)
+10. **Document post-incident review process** (§12)
+11. **Add to CI pipeline** — scanner must pass before merge
 
 ---
 
