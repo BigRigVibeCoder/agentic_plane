@@ -9,10 +9,10 @@ tags: [testing, verification, governance, standards, quality]
 related: [GOV-001]
 created: 2026-03-04
 updated: 2026-03-04
-version: 1.0.0
+version: 2.0.0
 ---
 
-> **BLUF:** This protocol defines the exhaustive testing taxonomy for all projects. 14 test categories are defined — from static analysis to soak testing. An agent reading this document knows exactly what to build, what tools to use, and what "done" looks like for each test type.
+> **BLUF:** NASA/JPL-grade testing protocol defining 14 test categories, bidirectional requirements traceability, assertion density mandates, MC/DC coverage, and forensic artifact requirements. An agent reading this document knows exactly what to build, what tools to use, and what "done" looks like.
 
 # Testing Protocol: The Proving Ground
 
@@ -28,6 +28,9 @@ version: 1.0.0
 4. **No Report = No Pass** — A test that produces no artifact is invalid. Reports are mandatory.
 5. **Fail Fast, Fail Loud** — Tests run in order from fastest to slowest. First failure halts the cascade.
 6. **Isolation Is Non-Negotiable** — Each test starts clean, runs in isolation, leaves no side effects.
+7. **Trace Everything** — Every test must trace back to a requirement. Every requirement must trace forward to a test. (DO-178C §6.4)
+8. **Assert Densely** — Minimum 2 assertions per function under test. Assertions remain active in production. (NASA JPL Power of Ten, Rule 5)
+9. **Flaky = Broken** — A test that fails intermittently is quarantined immediately. No flaky tests in the main suite.
 
 ---
 
@@ -87,6 +90,7 @@ Validate **isolated functions** with no external dependencies.
 | **Fast Execution** | < 100ms per test |
 | **No Side Effects** | No network, no disk, no database |
 | **External deps mocked** | All I/O boundaries mocked |
+| **Assertion density** | ≥2 assertions per test function (NASA JPL Rule 5) |
 
 **Tools**: pytest, Jest, JUnit, Go testing — whatever matches the project language.
 
@@ -337,23 +341,145 @@ tests/artifacts/
 
 ---
 
-## 19. Coverage Thresholds
+## 19. Requirements Traceability (DO-178C §6.4)
 
-| Metric | Target | Enforcement |
-|:-------|:-------|:------------|
-| Line coverage | ≥80% (≥95% shared libs) | CI blocks merge |
-| Branch coverage | ≥75% | CI blocks merge |
-| Function coverage | 100% public functions | CI blocks merge |
-| Mutation score | ≥80% | CI warns, blocks for safety-critical |
+> **"If you can't trace a test to a requirement, why does the test exist? If a requirement has no test, how do you know it works?"**
+
+Every test must have **bidirectional traceability**:
+
+```
+Requirement → Design → Code → Test → Test Result
+     ↑___________________________________________↓
+```
+
+### Implementation
+
+Use the `Refs:` field in test docstrings to link back to CODEX docs:
+
+```python
+def test_token_refresh():
+    """Verify JWT refresh within sliding window.
+    
+    Refs: EVO-012, BLU-005
+    Requirement: Users must not be logged out during active sessions.
+    """
+```
+
+### Traceability Matrix
+
+Maintain a traceability matrix (in `CODEX/40_VERIFICATION/`) mapping:
+
+| Requirement ID | Requirement | Test File | Test Function | Status |
+|:---------------|:------------|:----------|:--------------|:-------|
+| EVO-012 | Session persistence | test_auth.py | test_token_refresh | ✅ |
+| BLU-005 | API auth spec | test_auth.py | test_jwt_validation | ✅ |
+
+**Agent Rule**: When creating tests, ALWAYS link to the requirement being verified. When creating requirements, ALWAYS verify a test exists or create one.
 
 ---
 
-## 20. Agent Instructions
+## 20. Coverage Thresholds
+
+| Metric | Standard | Safety-Critical | Enforcement |
+|:-------|:---------|:----------------|:------------|
+| Line coverage | ≥80% | ≥95% | CI blocks merge |
+| Branch coverage | ≥75% | ≥90% | CI blocks merge |
+| Function coverage | 100% public | 100% all | CI blocks merge |
+| Mutation score | ≥80% | ≥95% | CI blocks merge |
+| MC/DC coverage | N/A | **Required** | CI blocks merge |
+| Assertion density | ≥2 per test | ≥3 per test | Linter warns |
+
+### MC/DC Coverage (DO-178C DAL-A)
+
+For safety-critical code paths, **Modified Condition/Decision Coverage** is required. Each condition in a boolean decision must independently affect the outcome:
+
+```python
+# Decision: if (A and B) or C
+# MC/DC requires proving each condition independently flips the result:
+# Test 1: A=T, B=T, C=F → True   (baseline)
+# Test 2: A=F, B=T, C=F → False  (A independently affects result)
+# Test 3: A=T, B=F, C=F → False  (B independently affects result)  
+# Test 4: A=F, B=F, C=T → True   (C independently affects result)
+```
+
+**When required**: Any function controlling safety, authorization, financial transactions, or destructive operations.
+
+---
+
+## 21. Regression Testing Policy
+
+Every **bug fix** must include a regression test that:
+1. **Reproduces** the original failure (test fails without the fix)
+2. **Verifies** the fix (test passes with the fix)
+3. **Remains** in the suite permanently — never deleted
+
+```python
+def test_regression_issue_42_null_token():
+    """Regression: null tokens caused 500 error.
+    
+    Refs: DEF-042
+    Fixed: 2026-03-04
+    """
+    response = api.refresh(token=None)
+    assert response.status_code == 401  # Not 500
+```
+
+**Agent Rule**: When fixing a bug, the FIRST step is writing a failing test. The LAST step is confirming it passes.
+
+---
+
+## 22. Flaky Test Quarantine
+
+A test that passes sometimes and fails sometimes is **broken**, not "intermittent."
+
+| Action | When |
+|:-------|:-----|
+| **Quarantine immediately** | Mark with `@pytest.mark.quarantine` or equivalent |
+| **Investigate within 48h** | Root cause: race condition? Timing? Shared state? |
+| **Fix or delete** | No test stays quarantined for more than 1 sprint |
+| **Never ignore** | A flaky test that's ignored will mask real failures |
+
+Common flaky test causes:
+- Shared mutable state between tests (fix: proper teardown)
+- Timing-dependent assertions (fix: use polling/retries with timeouts)
+- Port conflicts (fix: random port allocation)
+- File system race conditions (fix: temp directories per test)
+
+---
+
+## 23. Test Environment Reproducibility
+
+> **"If I can't reproduce your test result on a clean machine, your test is worthless."**
+
+| Requirement | How |
+|:------------|:----|
+| **Pinned dependencies** | Lockfiles (`poetry.lock`, `package-lock.json`) committed |
+| **Deterministic seeds** | Random seeds fixed and logged for reproducibility |
+| **Isolated temp dirs** | Each test run uses fresh `tempfile.mkdtemp()`, cleaned after |
+| **No host-dependent paths** | Use relative paths or env vars, never hardcoded absolutes |
+| **CI = Local parity** | Tests must pass identically in CI and on developer machines |
+| **Documented env setup** | `CODEX/30_RUNBOOKS/` contains test environment setup guide |
+
+---
+
+## 24. Test Independence & Review
+
+> NASA IV&V mandates that critical test verification be performed by someone other than the author.
+
+| Practice | Rule |
+|:---------|:-----|
+| **Tests written by non-author** | For safety-critical code, tests should be written or reviewed by a different agent/person than the code author |
+| **Peer review of test logic** | Test assertions reviewed for correctness, not just code coverage |
+| **No self-verifying PRs** | The agent that wrote the code should not be the sole reviewer of its tests |
+
+---
+
+## 25. Agent Instructions
 
 When an architect asks you to "set up testing" or "add tests," follow this checklist:
 
-1. **Read this protocol** — understand all 14 tiers
-2. **Assess applicability** — not every project needs HIL or chaos tests
+1. **Read this protocol** — understand all 14 tiers + requirements traceability
+2. **Assess applicability** — not every project needs HIL or chaos tests, but tiers 1-9 are almost always required
 3. **Start from the top** — implement static analysis first, then unit, then work down
 4. **Create the artifact directory structure** (§17)
 5. **Configure pytest markers** or equivalent:
@@ -365,10 +491,14 @@ When an architect asks you to "set up testing" or "add tests," follow this check
        e2e: Full system tests
        slow: Tests > 1 second
        safety: Safety-critical path tests
+       quarantine: Flaky tests under investigation
    ```
-6. **Set up coverage** with minimum thresholds
-7. **Add to CI pipeline** in fail-fast order (§18)
-8. **Update `CODEX/00_INDEX/MANIFEST.yaml`** when test specs are created
+6. **Set up coverage** with minimum thresholds (§20)
+7. **Create traceability matrix** linking requirements to tests (§19)
+8. **Add to CI pipeline** in fail-fast order (§18)
+9. **Ensure assertion density** ≥2 per test function
+10. **Pin all dependencies** with lockfiles for reproducibility (§23)
+11. **Update `CODEX/00_INDEX/MANIFEST.yaml`** when test specs are created
 
 ---
 
