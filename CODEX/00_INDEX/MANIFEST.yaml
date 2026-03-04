@@ -147,3 +147,16 @@ documents:
       Trace-first design for agent execution reconstruction. Database and
       flat-file storage, forensic query patterns, and retention policies.
 
+  - id: GOV-005
+    path: 10_GOVERNANCE/GOV-005_AgenticDevelopmentLifecycle.md
+    title: "Agentic Development Lifecycle"
+    type: reference
+    status: APPROVED
+    tags: [governance, standards, project-management, workflow]
+    agents: [all]
+    summary: >
+      Project lifecycle for human-Architect + AI-agent teams. Scope-bounded
+      sprints, emergent work items, one-agent-per-branch, natural checkpoints,
+      and human-in-the-loop merge/deploy. Replaces traditional Agile.
+
+
