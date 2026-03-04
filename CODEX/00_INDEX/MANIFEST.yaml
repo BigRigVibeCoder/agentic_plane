@@ -98,3 +98,15 @@ documents:
     summary: >
       Meta-standard defining naming conventions, YAML frontmatter requirements,
       folder structure, doc lifecycle, and AI-parseability mandates.
+
+  - id: GOV-002
+    path: 10_GOVERNANCE/GOV-002_TestingProtocol.md
+    title: "Testing Protocol"
+    type: reference
+    status: APPROVED
+    tags: [testing, verification, governance, standards, quality]
+    agents: [all]
+    summary: >
+      Exhaustive testing taxonomy with 14 test tiers from static analysis to
+      soak testing. Defines tools, thresholds, forensic artifacts, fail-fast
+      execution order, and agent instructions for implementing testing.
