@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="https://plane.so/static/images/plane-logo.webp" width="80" />
+  <img src="docs/screenshots/banner.png" width="700" />
 </p>
-
-<h1 align="center">Agentic Plane</h1>
 
 <p align="center">
   <b>Autonomous AI agents. Governed workflows. One command center.</b>
