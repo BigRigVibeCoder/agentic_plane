@@ -43,25 +43,19 @@ This isn't a Plane fork. It's an **agentic control plane** that sits on top of P
 
 Every time an agent pipeline runs, a work item appears on the board. No human had to type these in.
 
-<p align="center">
-  <img src="docs/screenshots/board_view.png" width="800" />
-</p>
+![Board View — Agent work items auto-created by agentic_run.py](docs/screenshots/board_view.png)
 
 ### Work Item Detail — Full Pipeline Context
 
 Each auto-created ticket captures the original prompt, the agent that ran it, and the DarkGravity pipeline metadata.
 
-<p align="center">
-  <img src="docs/screenshots/work_item_detail.png" width="800" />
-</p>
+![Work Item Detail — DarkGravity pipeline context](docs/screenshots/work_item_detail.png)
 
 ### Custom Agentic States — The Development Lifecycle
 
 Seven custom workflow states map to the Agentic Development Lifecycle, from initial conversation through deployment.
 
-<p align="center">
-  <img src="docs/screenshots/project_settings.png" width="800" />
-</p>
+![Custom Agentic States — Conversation through Deployed](docs/screenshots/project_settings.png)
 
 ---
 
