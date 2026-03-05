@@ -1,14 +1,18 @@
 import pytest
+import os
 from plane_bridge import PlaneHybridClient
 
 @pytest.mark.unit
-def test_hybrid_client_initialization_requires_api_key():
+def test_hybrid_client_initialization_requires_api_key(monkeypatch):
     """Verify that the client requires a Plane API key to start.
     
     Refs: EVO-001
     Requirement: The Hybrid Client must fail fast if credentials are missing
     to prevent opaque failures during pipeline execution.
     """
+    # Ensure no env var leaks into the test
+    monkeypatch.delenv("PLANE_API_KEY", raising=False)
+    
     # Act & Assert
     with pytest.raises(ValueError, match="PLANE_API_KEY is required"):
         PlaneHybridClient(api_key=None)

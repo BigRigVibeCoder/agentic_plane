@@ -34,7 +34,7 @@ class PlaneHybridClient:
         retry_strategy = Retry(
             total=5,
             backoff_factor=1,
-            status_forcelist=[409, 412, 429, 500, 502, 503, 504],
+            status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=["HEAD", "GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
@@ -46,9 +46,9 @@ class PlaneHybridClient:
             "Content-Type": "application/json"
         })
 
-    def _request(self, method: str, endpoint: str, **kwargs) -> Dict[str, Any]:
+    def _request(self, method: str, endpoint: str, api_prefix: str = "/api/v1", **kwargs) -> Dict[str, Any]:
         """Make a REST API request to Plane."""
-        url = f"{self.base_url}/api/v1{endpoint}"
+        url = f"{self.base_url}{api_prefix}{endpoint}"
         response = self.session.request(method, url, **kwargs)
         
         if not response.ok:
@@ -77,10 +77,10 @@ class PlaneHybridClient:
         
     def create_label(self, name: str, color: str = "#000000", parent_id: Optional[str] = None) -> Dict[str, Any]:
         """Create a CODEX taxonomy label via REST API."""
-        if not self.workspace_slug:
-            raise ValueError("workspace_slug is required")
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
             
-        endpoint = f"/workspaces/{self.workspace_slug}/labels/"
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/labels/"
         payload = {
             "name": name,
             "color": color
@@ -111,7 +111,7 @@ class PlaneHybridClient:
             "name": title,
             "description_html": description_html
         }
-        return self._request("POST", endpoint, json=payload)
+        return self._request("POST", endpoint, api_prefix="/api", json=payload)
 
     def list_pages(self) -> List[Dict[str, Any]]:
         """List all pages in a project via REST API."""
@@ -119,7 +119,7 @@ class PlaneHybridClient:
             raise ValueError("workspace_slug and project_id are required")
             
         endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/pages/"
-        response = self._request("GET", endpoint)
+        response = self._request("GET", endpoint, api_prefix="/api")
         
         # Plane paginates results, but for our scale, the first page is usually enough.
         # It's an array for some versions or a paginated dict.
@@ -139,7 +139,7 @@ class PlaneHybridClient:
             "name": title,
             "description_html": description_html
         }
-        return self._request("PATCH", endpoint, json=payload)
+        return self._request("PATCH", endpoint, api_prefix="/api", json=payload)
 
     def get_states(self) -> List[Dict[str, Any]]:
         """List all custom states in a project via REST API."""
@@ -157,10 +157,10 @@ class PlaneHybridClient:
         
     def get_labels(self) -> List[Dict[str, Any]]:
         """List all labels in a project via REST API."""
-        if not self.workspace_slug:
-            raise ValueError("workspace_slug is required")
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
             
-        endpoint = f"/workspaces/{self.workspace_slug}/labels/"
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/labels/"
         response = self._request("GET", endpoint)
         
         if isinstance(response, dict) and "results" in response:

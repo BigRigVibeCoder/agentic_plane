@@ -51,7 +51,7 @@ def test_create_label_hierarchical_payload(plane_client):
     """
     with requests_mock.Mocker() as m:
         # Arrange
-        url = "http://test-plane/api/v1/workspaces/test-workspace/labels/"
+        url = "http://test-plane/api/v1/workspaces/test-workspace/projects/test-project/labels/"
         m.post(url, json={"id": "label-child", "name": "GOV-001", "parent": "label-parent"})
         
         # Act
