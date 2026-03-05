@@ -1,174 +1,246 @@
-<br /><br />
-
 <p align="center">
-<a href="https://plane.so">
-  <img src="https://media.docs.plane.so/logo/plane_github_readme.png" alt="Plane Logo" width="400">
-</a>
+  <img src="https://plane.so/static/images/plane-logo.webp" width="80" />
 </p>
-<p align="center"><b>Modern project management for all teams</b></p>
+
+<h1 align="center">Agentic Plane</h1>
 
 <p align="center">
-<a href="https://discord.com/invite/A92xrEGCge">
-<img alt="Discord online members" src="https://img.shields.io/discord/1031547764020084846?color=5865F2&label=Discord&style=for-the-badge" />
-</a>
-<img alt="Commit activity per month" src="https://img.shields.io/github/commit-activity/m/makeplane/plane?style=for-the-badge" />
+  <b>Autonomous AI agents. Governed workflows. One command center.</b>
 </p>
 
 <p align="center">
-    <a href="https://plane.so/"><b>Website</b></a> •
-    <a href="https://github.com/makeplane/plane/releases"><b>Releases</b></a> •
-    <a href="https://twitter.com/planepowers"><b>Twitter</b></a> •
-    <a href="https://docs.plane.so/"><b>Documentation</b></a>
+  Built on top of <a href="https://github.com/makeplane/plane">Plane</a> — the open-source project management tool — to create a fully automated <b>Agentic Development Lifecycle</b> where AI agents plan, execute, verify, and deploy code under human governance.
 </p>
 
-<p>
-    <a href="https://app.plane.so/#gh-light-mode-only" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-top.webp"
-        alt="Plane Screens"
-        width="100%"
-      />
-    </a>
+<p align="center">
+  <a href="#-what-is-this">What is this?</a> •
+  <a href="#-screenshots">Screenshots</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#%EF%B8%8F-quickstart">Quickstart</a> •
+  <a href="#-the-agentic-loop">The Agentic Loop</a> •
+  <a href="#-codex-governance">CODEX Governance</a>
 </p>
 
-Meet [Plane](https://plane.so/), an open-source project management tool to track issues, run ~sprints~ cycles, and manage product roadmaps without the chaos of managing the tool itself. 🧘‍♀️
+---
 
-> Plane is evolving every day. Your suggestions, ideas, and reported bugs help us immensely. Do not hesitate to join in the conversation on [Discord](https://discord.com/invite/A92xrEGCge) or raise a GitHub issue. We read everything and respond to most.
+## 🧬 What is this?
 
-## 🚀 Installation
+**Agentic Plane** extends [Plane's](https://plane.so) codebase with an automation layer that lets AI agents operate as first-class team members:
 
-Getting started with Plane is simple. Choose the setup that works best for you:
+- 🤖 **Agents auto-create work items** — every pipeline run generates a tracked Plane ticket
+- 🔄 **State changes trigger pipelines** — drag a card to "Sprint Active" and an AI agent starts coding
+- 🏷️ **CODEX taxonomy enforcement** — governance protocols, agent roles, and priority levels are baked into the label system
+- 📊 **Cost & token tracking** — know exactly how much each agent run costs in API tokens
+- 🪝 **Webhook-driven orchestration** — a FastAPI listener bridges Plane events to DarkGravity agent pipelines
 
-- **Plane Cloud**
-  Sign up for a free account on [Plane Cloud](https://app.plane.so)—it's the fastest way to get up and running without worrying about infrastructure.
+This isn't a Plane fork. It's an **agentic control plane** that sits on top of Plane's API and turns it into a mission control for autonomous AI development.
 
-- **Self-host Plane**
-  Prefer full control over your data and infrastructure? Install and run Plane on your own servers. Follow our detailed [deployment guides](https://developers.plane.so/self-hosting/overview) to get started.
-
-| Installation methods | Docs link                                                                                                                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Docker               | [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://developers.plane.so/self-hosting/methods/docker-compose)         |
-| Kubernetes           | [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://developers.plane.so/self-hosting/methods/kubernetes) |
-
-`Instance admins` can configure instance settings with [God mode](https://developers.plane.so/self-hosting/govern/instance-admin).
-
-## 🌟 Features
-
-- **Issues**
-  Efficiently create and manage tasks with a robust rich text editor that supports file uploads. Enhance organization and tracking by adding sub-properties and referencing related issues.
-
-- **Cycles**
-  Maintain your team’s momentum with Cycles. Track progress effortlessly using burn-down charts and other insightful tools.
-
-- **Modules**
-  Simplify complex projects by dividing them into smaller, manageable modules.
-
-- **Views**
-  Customize your workflow by creating filters to display only the most relevant issues. Save and share these views with ease.
-
-- **Pages**
-  Capture and organize ideas using Plane Pages, complete with AI capabilities and a rich text editor. Format text, insert images, add hyperlinks, or convert your notes into actionable items.
-
-- **Analytics**
-  Access real-time insights across all your Plane data. Visualize trends, remove blockers, and keep your projects moving forward.
-
-- **Drive** (_coming soon_): The drive helps you share documents, images, videos, or any other files that make sense to you or your team and align on the problem/solution.
-
-## 🛠️ Local development
-
-See [CONTRIBUTING](./CONTRIBUTING.md)
-
-## ⚙️ Built with
-
-[![Next JS](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)](https://www.djangoproject.com/)
-[![Node JS](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white)](https://nodejs.org/en)
+---
 
 ## 📸 Screenshots
 
-  <p>
-    <a href="https://plane.so" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-work-items.webp"
-        alt="Plane Views"
-        width="100%"
-      />
-    </a>
-  </p>
-  <p>
-    <a href="https://plane.so" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-cycles.webp"
-        width="100%"
-      />
-    </a>
-  </p>
-  <p>
-    <a href="https://plane.so" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-modules.webp"
-        alt="Plane Cycles and Modules"
-        width="100%"
-      />
-    </a>
-  </p>
-  <p>
-    <a href="https://plane.so" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-views.webp"
-        alt="Plane Analytics"
-        width="100%"
-      />
-    </a>
-  </p>
-   <p>
-    <a href="https://plane.so" target="_blank">
-      <img
-        src="https://media.docs.plane.so/GitHub-readme/github-analytics.webp"
-        alt="Plane Pages"
-        width="100%"
-      />
-    </a>
-  </p>
+### The Board — Agent Work Items Created Automatically
+
+Every time an agent pipeline runs, a work item appears on the board. No human had to type these in.
+
+<p align="center">
+  <img src="docs/screenshots/board_view.png" width="800" />
 </p>
 
-## 📝 Documentation
+### Work Item Detail — Full Pipeline Context
 
-Explore Plane's [product documentation](https://docs.plane.so/) and [developer documentation](https://developers.plane.so/) to learn about features, setup, and usage.
+Each auto-created ticket captures the original prompt, the agent that ran it, and the DarkGravity pipeline metadata.
 
-## ❤️ Community
+<p align="center">
+  <img src="docs/screenshots/work_item_detail.png" width="800" />
+</p>
 
-Join the Plane community on [GitHub Discussions](https://github.com/orgs/makeplane/discussions) and our [Discord server](https://discord.com/invite/A92xrEGCge). We follow a [Code of conduct](https://github.com/makeplane/plane/blob/master/CODE_OF_CONDUCT.md) in all our community channels.
+### Custom Agentic States — The Development Lifecycle
 
-Feel free to ask questions, report bugs, participate in discussions, share ideas, request features, or showcase your projects. We’d love to hear from you!
+Seven custom workflow states map to the Agentic Development Lifecycle, from initial conversation through deployment.
 
-## 🛡️ Security
+<p align="center">
+  <img src="docs/screenshots/project_settings.png" width="800" />
+</p>
 
-If you discover a security vulnerability in Plane, please report it responsibly instead of opening a public issue. We take all legitimate reports seriously and will investigate them promptly. See [Security policy](https://github.com/makeplane/plane/blob/master/SECURITY.md) for more info.
+---
 
-To disclose any security issues, please email us at security@plane.so.
+## 🏗️ Architecture
 
-## 🤝 Contributing
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AGENTIC CONTROL PLANE                    │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │ agentic_run  │  │ codex_sync   │  │ cost_logger      │  │
+│  │              │  │              │  │                  │  │
+│  │ Auto-creates │  │ Syncs CODEX  │  │ Tracks tokens &  │  │
+│  │ work items   │  │ docs to Page │  │ costs per ticket │  │
+│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
+│         │                 │                    │            │
+│         └─────────────────┼────────────────────┘            │
+│                           │                                 │
+│                  ┌────────▼────────┐                        │
+│                  │  plane_bridge   │                        │
+│                  │  (Hybrid Client)│                        │
+│                  └────────┬────────┘                        │
+│                           │ REST API                        │
+├───────────────────────────┼─────────────────────────────────┤
+│                           │                                 │
+│              ┌────────────▼────────────┐                    │
+│              │      PLANE (Docker)     │                    │
+│              │                         │                    │
+│              │  ┌─────┐ ┌─────┐       │                    │
+│              │  │ API │ │ Web │       │   ◄── Webhook ──┐  │
+│              │  └─────┘ └─────┘       │                 │  │
+│              │  ┌─────┐ ┌─────┐       │    ┌────────────┴┐ │
+│              │  │ DB  │ │Redis│       │    │  webhook    │ │
+│              │  └─────┘ └─────┘       │    │  listener   │ │
+│              └────────────────────────┘    └─────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
 
-There are many ways you can contribute to Plane:
+---
 
-- Report [bugs](https://github.com/makeplane/plane/issues/new?assignees=srinivaspendem%2Cpushya22&labels=%F0%9F%90%9Bbug&projects=&template=--bug-report.yaml&title=%5Bbug%5D%3A+) or submit [feature requests](https://github.com/makeplane/plane/issues/new?assignees=srinivaspendem%2Cpushya22&labels=%E2%9C%A8feature&projects=&template=--feature-request.yaml&title=%5Bfeature%5D%3A+).
-- Review the [documentation](https://docs.plane.so/) and submit [pull requests](https://github.com/makeplane/docs) to improve it—whether it's fixing typos or adding new content.
-- Talk or write about Plane or any other ecosystem integration and [let us know](https://discord.com/invite/A92xrEGCge)!
-- Show your support by upvoting [popular feature requests](https://github.com/makeplane/plane/issues).
+## 🔄 The Agentic Loop
 
-Please read [CONTRIBUTING.md](https://github.com/makeplane/plane/blob/master/CONTRIBUTING.md) for details on the process for submitting pull requests to us.
+Work items flow through seven custom states that mirror a complete AI development lifecycle:
 
-### Repo activity
+| State | What Happens |
+|-------|-------------|
+| **Conversation** | Human defines intent. Agent is listening. |
+| **Spec Review** | Agent produces a specification. Human reviews. |
+| **Sprint Active** | Agent is writing code. Webhook triggers the pipeline. |
+| **Checkpoint** | Agent pauses for human review mid-sprint. |
+| **Verification** | Automated tests run. Agent validates its own work. |
+| **Merge Ready** | Code passes review. Ready for integration. |
+| **Deployed** | Live in production. The loop closes. |
 
-![Plane Repo Activity](https://repobeats.axiom.co/api/embed/2523c6ed2f77c082b7908c33e2ab208981d76c39.svg "Repobeats analytics image")
+When a ticket moves to **Sprint Active**, the webhook listener automatically triggers a DarkGravity pipeline. When the pipeline finishes, it moves the ticket to **Verification**. Humans only intervene at checkpoints.
 
-### We couldn't have done this without you.
+---
 
-<a href="https://github.com/makeplane/plane/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=makeplane/plane" />
-</a>
+## 🏛️ CODEX Governance
 
-## License
+Every work item is tagged with labels from the **CODEX taxonomy** — a structured governance framework that ensures agents operate within defined boundaries:
 
-This project is licensed under the [GNU Affero General Public License v3.0](https://github.com/makeplane/plane/blob/master/LICENSE.txt).
+| Category | Labels |
+|----------|--------|
+| **Governance** | `GOV-001` through `GOV-006` — protocol enforcement |
+| **Agent Roles** | `agent:architect`, `agent:researcher`, `agent:coder`, `agent:tester` |
+| **Priority** | `P0-critical`, `P1-high`, `P2-medium`, `P3-low` |
+| **Work Type** | `blueprint`, `defect`, `research`, `evolution`, `feature` |
+
+The full CODEX framework lives in the [`CODEX/`](CODEX/) directory — governance protocols, blueprints, runbooks, and evolution plans that define how agents are allowed to operate.
+
+---
+
+## ⚡️ Quickstart
+
+### Prerequisites
+
+- Docker & Docker Compose
+- Python 3.12+
+- Git
+
+### 1. Clone & Start
+
+```bash
+git clone https://github.com/BigRigVibeCoder/agentic_plane.git
+cd agentic_plane
+sudo docker compose up -d
+```
+
+### 2. Set Up Plane
+
+Open [http://localhost](http://localhost), create an account, workspace, and project. Generate a Personal Access Token.
+
+### 3. Configure
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install requests fastapi uvicorn pytest requests-mock markdown pyyaml httpx
+
+export PLANE_API_KEY="your-token-here"
+export PLANE_WORKSPACE_SLUG="your-workspace"
+export PLANE_PROJECT_ID="your-project-uuid"
+```
+
+### 4. Provision the Agentic Workflow
+
+```bash
+python plane_agentic_setup.py \
+  --api-key "$PLANE_API_KEY" \
+  --workspace "$PLANE_WORKSPACE_SLUG" \
+  --project "$PLANE_PROJECT_ID"
+```
+
+This creates the 7 custom states and 24 CODEX taxonomy labels in your Plane project.
+
+### 5. Create Your First Agent Work Item
+
+```bash
+python agentic_run.py "Research the best approach for distributed caching"
+```
+
+Open Plane — your work item is on the board. 🎉
+
+### 6. Start the Webhook Listener
+
+```bash
+uvicorn webhook_listener:app --host 0.0.0.0 --port 9000
+```
+
+Now drag a ticket to "Sprint Active" and watch the pipeline fire.
+
+📖 **Full step-by-step guide:** [`CODEX/30_RUNBOOKS/RUN-001_Quickstart.md`](CODEX/30_RUNBOOKS/RUN-001_Quickstart.md)
+
+---
+
+## 🧪 Testing
+
+```bash
+pytest tests/ -v
+```
+
+```
+8 passed in 0.33s ✅
+```
+
+All tests follow the [GOV-002 Testing Protocol](CODEX/10_GOVERNANCE/GOV-002_TestingProtocol.md) with unit, integration, and end-to-end coverage.
+
+---
+
+## 📁 Project Structure
+
+```
+agentic_plane/
+├── plane_bridge.py              # Hybrid API client (REST + MCP ready)
+├── plane_agentic_setup.py       # Provisions states & labels
+├── agentic_run.py               # Auto-creates tickets + runs pipelines
+├── agentic_cost_logger.py       # Logs token costs to work items
+├── codex_to_plane_sync.py       # Syncs CODEX docs to Plane Pages
+├── webhook_listener.py          # FastAPI webhook → pipeline trigger
+├── plane_views_config.json      # Dashboard view definitions
+├── docker-compose.yml           # Full Plane stack (12 containers)
+├── tests/                       # GOV-002 compliant test suite
+├── CODEX/                       # Governance framework
+│   ├── 10_GOVERNANCE/           # Protocols & standards
+│   ├── 20_BLUEPRINTS/           # Architecture docs
+│   ├── 30_RUNBOOKS/             # Operational guides
+│   ├── 40_SPECS/                # Technical specifications
+│   └── 60_EVOLUTION/            # Sprint plans & roadmap
+└── apps/                        # Plane source (upstream)
+```
+
+---
+
+## 🤝 Built On
+
+This project extends [**Plane**](https://github.com/makeplane/plane) — the open-source, self-hosted project management tool. Plane provides the UI, API, and data layer. We add the agentic automation layer on top, interacting exclusively through Plane's REST API without modifying its source code.
+
+---
+
+## 📜 License
+
+This project builds on Plane's codebase. See [Plane's license](https://github.com/makeplane/plane/blob/master/LICENSE) for details on the upstream project. The agentic automation layer (scripts in the root directory) is provided as-is for demonstration purposes.
