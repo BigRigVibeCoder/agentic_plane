@@ -143,3 +143,15 @@ build/
 AGENTS.md
 temp/
 scripts/
+
+# DarkGravity workspace (per-project ephemeral state)
+.darkgravity/darkgravity.db
+.darkgravity/darkgravity.db-wal
+.darkgravity/darkgravity.db-shm
+.darkgravity/embeddings/
+.darkgravity/sessions/
+.darkgravity/backups/
+.darkgravity/hashes.json
+.darkgravity/workspace.json
+.secrets/
+cloudflared\ncloudflare.log\n.venv\n.pytest_cache\n__pycache__
