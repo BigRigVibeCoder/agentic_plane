@@ -25,6 +25,22 @@ class PlaneHybridClient:
         self.base_url = base_url.rstrip("/")
         
         self.session = requests.Session()
+        
+        # Phase 3 requirement: Multi-agent contention handling
+        # Plane API will throw 429 (Too Many Requests) or 409 (Conflict) on optimistic locking failures.
+        # We configure exponential backoff automatically below.
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+        retry_strategy = Retry(
+            total=5,
+            backoff_factor=1,
+            status_forcelist=[409, 412, 429, 500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
+        
         self.session.headers.update({
             "x-api-key": self.api_key,
             "Content-Type": "application/json"
@@ -94,5 +110,90 @@ class PlaneHybridClient:
         payload = {
             "name": title,
             "description_html": description_html
+        }
+        return self._request("POST", endpoint, json=payload)
+
+    def list_pages(self) -> List[Dict[str, Any]]:
+        """List all pages in a project via REST API."""
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/pages/"
+        response = self._request("GET", endpoint)
+        
+        # Plane paginates results, but for our scale, the first page is usually enough.
+        # It's an array for some versions or a paginated dict.
+        if isinstance(response, dict) and "results" in response:
+            return response["results"]
+        elif isinstance(response, list):
+            return response
+        return []
+
+    def update_page(self, page_id: str, title: str, description_html: str) -> Dict[str, Any]:
+        """Update an existing page in a project via REST API."""
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/pages/{page_id}/"
+        payload = {
+            "name": title,
+            "description_html": description_html
+        }
+        return self._request("PATCH", endpoint, json=payload)
+
+    def get_states(self) -> List[Dict[str, Any]]:
+        """List all custom states in a project via REST API."""
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/states/"
+        response = self._request("GET", endpoint)
+        
+        if isinstance(response, dict) and "results" in response:
+            return response["results"]
+        elif isinstance(response, list):
+            return response
+        return []
+        
+    def get_labels(self) -> List[Dict[str, Any]]:
+        """List all labels in a project via REST API."""
+        if not self.workspace_slug:
+            raise ValueError("workspace_slug is required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/labels/"
+        response = self._request("GET", endpoint)
+        
+        if isinstance(response, dict) and "results" in response:
+            return response["results"]
+        elif isinstance(response, list):
+            return response
+        return []
+
+    def create_issue(self, name: str, description_html: str = "", state_id: str = None, label_ids: List[str] = None) -> Dict[str, Any]:
+        """Create a new issue (work item) via REST API."""
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/issues/"
+        payload = {
+            "name": name,
+            "description_html": description_html
+        }
+        if state_id:
+            payload["state_id"] = state_id
+        if label_ids:
+            payload["label_ids"] = label_ids
+            
+        return self._request("POST", endpoint, json=payload)
+
+    def add_worklog(self, issue_id: str, duration_minutes: int, description: str = "") -> Dict[str, Any]:
+        """Add a time/cost worklog to a work item via REST API."""
+        if not self.workspace_slug or not self.project_id:
+            raise ValueError("workspace_slug and project_id are required")
+            
+        endpoint = f"/workspaces/{self.workspace_slug}/projects/{self.project_id}/issues/{issue_id}/worklogs/"
+        payload = {
+            "time_spent": duration_minutes,
+            "description": description
         }
         return self._request("POST", endpoint, json=payload)

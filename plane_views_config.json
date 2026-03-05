@@ -1,0 +1,52 @@
+[
+    {
+        "name": "🕵️ Agent Activity (24h)",
+        "description": "What did the DarkGravity agents do today?",
+        "query": {
+            "labels": [
+                "agent:coder",
+                "agent:researcher",
+                "agent:tester",
+                "agent:architect"
+            ],
+            "updated_at": "last_24_hours"
+        },
+        "view_type": "list"
+    },
+    {
+        "name": "🚀 Active Pipelines",
+        "description": "Which DarkGravity runs are actively chewing tokens right now?",
+        "query": {
+            "state_group": [
+                "started"
+            ],
+            "states": [
+                "Sprint Active",
+                "Verification"
+            ]
+        },
+        "view_type": "kanban"
+    },
+    {
+        "name": "🚨 Blocked Pipelines",
+        "description": "Pipelines halted awaiting Architect consensus or review.",
+        "query": {
+            "states": [
+                "Checkpoint"
+            ],
+            "labels": [
+                "P0-critical",
+                "P1-high"
+            ]
+        },
+        "view_type": "list"
+    },
+    {
+        "name": "💸 Agentic Cost Report",
+        "description": "High-level overview of LLM token burn rates.",
+        "query": {
+            "has_worklogs": true
+        },
+        "view_type": "list"
+    }
+]
